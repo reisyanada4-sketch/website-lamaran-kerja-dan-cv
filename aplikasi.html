@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Surat Modern v2.0</title>
+    <!-- Google Fonts & FontAwesome untuk Ikon -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --border: #cbd5e1;
+            --sidebar-bg: #1e293b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: #f1f5f9;
+            color: var(--dark);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Konfigurasi */
+        .sidebar {
+            width: 440px;
+            background: var(--sidebar-bg);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
+            z-index: 10;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            background: #0f172a;
+            border-bottom: 1px solid #334155;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-header h2 i {
+            color: #60a5fa;
+        }
+
+        .sidebar-header p {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        .form-container {
+            padding: 20px 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .form-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .form-container::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #cbd5e1;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 14px;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .form-group input, 
+        .form-group select, 
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 14px 10px 40px;
+            background: #334155;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .form-group textarea {
+            padding-left: 14px;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-group input:focus, 
+        .form-group select:focus, 
+        .form-group textarea:focus {
+            border-color: #60a5fa;
+            background: #1e293b;
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+        }
+
+        /* Area Utama & Preview */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #f8fafc;
+            overflow: hidden;
+        }
+
+        .top-navbar {
+            padding: 20px 30px;
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .top-navbar h1 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #334155;
+        }
+
+        .action-actions-top {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-pdf {
+            background-color: #ef4444;
+            color: white;
+        }
+        .btn-pdf:hover {
+            background-color: #dc2626;
+        }
+
+        .btn-print {
+            background-color: var(--primary);
+            color: white;
+        }
+        .btn-print:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .preview-viewport {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        /* Tampilan Kertas Surat A4 Realistis */
+        .paper-sheet {
+            background: white;
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm 25mm;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+            font-family: 'Times New Roman', Times, serif;
+            color: #111;
+            font-size: 11pt;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        /* Kop Surat Elegan */
+        .kop-surat {
+            display: flex;
+            align-items: center;
+            border-bottom: 3px double #000;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        .kop-logo {
+            font-size: 32px;
+            color: var(--primary);
+            margin-right: 20px;
+        }
+
+        .kop-text {
+            text-align: center;
+            flex: 1;
+        }
+
+        .kop-text h3 {
+            font-size: 13pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kop-text h2 {
+            font-size: 15pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #0f172a;
+            margin: 2px 0;
+        }
+
+        .kop-text p {
+            font-size: 9pt;
+            color: #444;
+            font-style: italic;
+        }
+
+        /* Isi Komponen Surat */
+        .surat-info-tabel {
+            width: 100%;
+            margin-bottom: 20px;
+            border-collapse: collapse;
+        }
+
+        .surat-info-tabel td {
+            padding: 2px 0;
+            vertical-align: top;
+        }
+
+        .surat-body {
+            text-align: justify;
+            margin-bottom: 20px;
+        }
+
+        .surat-body p {
+            margin-bottom: 12px;
+            text-indent: 40px;
+        }
+
+        .ttd-section {
+            margin-top: 40px;
+            float: right;
+            text-align: center;
+            width: 200px;
+        }
+
+        .ttd-space {
+            height: 65px;
+        }
+
+        /* Mode Cetak (Print) */
+        @media print {
+            body {
+                background: white;
+            }
+            .sidebar, .top-navbar {
+                display: none !important;
+            }
+            .main-content {
+                background: white;
+            }
+            .preview-viewport {
+                padding: 0;
+                overflow: visible;
+            }
+            .paper-sheet {
+                box-shadow: none;
+                width: 100%;
+                min-height: auto;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Konfigurasi -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fa-solid fa-file-pen"></i> Konfigurasi Surat</h2>
+            <p>Sesuaikan data surat secara real-time</p>
+        </div>
+
+        <div class="form-container">
+            <div class="form-group">
+                <label>Pilih Template Surat</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <select id="jenisSurat" onchange="changeTemplate()">
+                        <option value="resmi">Surat Resmi / Dinas</option>
+                        <option value="lamaran">Surat Lamaran Kerja</option>
+                        <option value="sakit">Surat Izin Sakit Sekolah</option>
+                        <option value="pernyataan">Surat Pernyataan</option>
+                    </select>
+                </div>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid #334155; margin: 16px 0;">
+
+            <!-- Form input dinamis akan muncul di sini secara otomatis -->
+            <div id="dynamicForm"></div>
+        </div>
+    </div>
+
+    <!-- Area Konten Utama & Live Preview -->
+    <div class="main-content">
+        <div class="top-navbar">
+            <h1><i class="fa-regular fa-eye" style="color: var(--primary); margin-right: 6px;"></i> Live Preview Surat</h1>
+            <div class="action-actions-top">
+                <button class="btn btn-pdf" onclick="window.print()">
+                    <i class="fa-solid fa-file-pdf"></i> Simpan dlm PDF
+                </button>
+                <button class="btn btn-print" onclick="window.print()">
+                    <i class="fa-solid fa-print"></i> Cetak Surat
+                </button>
+            </div>
+        </div>
+
+        <div class="preview-viewport">
+            <div class="paper-sheet" id="letterPaper">
+                <!-- Template surat dirender disini -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const templates = {
+            resmi: {
+                fields: [
+                    { id: 'instansi', label: 'Nama Instansi / Perusahaan', icon: 'fa-building', type: 'text', default: 'PT INOVASI MANDIRI JAYA' },
+                    { id: 'alamatInstansi', label: 'Alamat Instansi', icon: 'fa-location-dot', type: 'text', default: 'Jl. Jend. Sudirman No. 10 | Jakarta Pusat' },
+                    { id: 'nomorSurat', label: 'Nomor Surat', icon: 'fa-hashtag', type: 'text', default: '045/IMJ/X/2026' },
+                    { id: 'lampiran', label: 'Lampiran', icon: 'fa-paperclip', type: 'text', default: '-' },
+                    { id: 'perihal', label: 'Perihal / Hal', icon: 'fa-tag', type: 'text', default: 'Undangan Rapat Koordinasi' },
+                    { id: 'tanggal', label: 'Tanggal Surat', icon: 'fa-calendar', type: 'text', default: '13 Oktober 2026' },
+                    { id: 'tujuan', label: 'Kepada Yth.', icon: 'fa-user', type: 'text', default: 'Seluruh Kepala Bagian Divisi' },
+                    { id: 'isi', label: 'Isi Ringkas Surat', icon: 'fa-align-left', type: 'textarea', default: 'Sehubungan dengan akan dimulainya proyek pengembangan aplikasi baru semester ini, kami mengundang Bapak/Ibu sekalian untuk menghadiri rapat koordinasi yang akan dilaksanakan pada hari Rabu pukul 09.00 WIB.' },
+                    { id: 'penandatangan', label: 'Nama Penandatangan', icon: 'fa-signature', type: 'text', default: 'Budi Hartono, M.Kom.' },
+                    { id: 'jabatan', label: 'Jabatan Penandatangan', icon: 'fa-briefcase', type: 'text', default: 'Direktur Utama' }
+                ],
+                render: (d) => `
+                    <div class="kop-surat">
+                        <div class="kop-logo"><i class="fa-solid fa-globe"></i></div>
+                        <div class="kop-text">
+                            <h3>PEMERINTAH / PERUSAHAAN</h3>
+                            <h2>${d.instansi}</h2>
+                            <p>${d.alamatInstansi}</p>
+                        </div>
+                    </div>
+                    <table class="surat-info-tabel">
+                        <tr>
+                            <td width="70">Nomor</td><td width="15">:</td><td>${d.nomorSurat}</td>
+                            <td width="150" style="text-align: right;">${d.tanggal}</td>
+                        </tr>
+                        <tr><td>Lampiran</td><td>:</td><td>${d.lampiran}</td><td></td></tr>
+                        <tr><td>Perihal</td><td>:</td><td><strong>${d.perihal}</strong></td><td></td></tr>
+                    </table>
+                    <div style="margin: 20px 0;">
+                        Yth. ${d.tujuan}<br>
+                        di Tempat
+                    </div>
+                    <div class="surat-body">
+                        <p>Dengan hormat,</p>
+                        <p>${d.isi}</p>
+                        <p>Demikian undangan ini kami sampaikan. Mengingat pentingnya acara tersebut, kehadiran Bapak/Ibu tepat pada waktunya sangat kami harapkan. Atas perhatian dan kerjasamanya, kami ucapkan terima kasih.</p>
+                    </div>
+                    <div class="ttd-section">
+                        Hormat kami,<br>
+                        ${d.jabatan}
+                        <div class="ttd-space"></div>
+                        <strong><u>${d.penandatangan}</u></strong>
+                    </div>
+                `
+            },
+            lamaran: {
+                fields: [
+                    { id: 'kota', label: 'Kota & Tanggal', icon: 'fa-calendar', type: 'text', default: 'Jakarta, 13 Oktober 2026' },
+                    { id: 'perusahaan', label: 'Perusahaan Tujuan', icon: 'fa-building', type: 'text', default: 'PT Teknologi Nusantara' },
+                    { id: 'posisi', label: 'Posisi Dilamar', icon: 'fa-briefcase', type: 'text', default: 'Junior Web Developer' },
+                    { id: 'nama', label: 'Nama Lengkap', icon: 'fa-user', type: 'text', default: 'Ahmad Fauzi' },
+                    { id: 'email', label: 'Email', icon: 'fa-envelope', type: 'text', default: 'ahmad.fauzi@email.com' },
+                    { id: 'telepon', label: 'No. Telepon / HP', icon: 'fa-phone', type: 'text', default: '081234567890' },
+                    { id: 'keahlian', label: 'Keahlian / Pengalaman', icon: 'fa-code', type: 'textarea', default: 'menguasai bahasa pemrograman PHP, Laravel, HTML, CSS, serta pengelolaan basis data relational.' }
+                ],
+                render: (d) => `
+                    <div style="text-align: right; margin-bottom: 20px;">
+                        ${d.kota}
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        Perihal : Lamaran Pekerjaan - <strong>${d.posisi}</strong><br><br>
+                        Yth. HRD Manager<br>
+                        ${d.perusahaan}<br>
+                        di Tempat
+                    </div>
+                    <div class="surat-body">
+                        <p>Dengan hormat,</p>
+                        <p>Sehubungan dengan informasi lowongan pekerjaan yang saya temukan, melalui surat ini saya bermaksud mengajukan diri untuk bergabung dengan ${d.perusahaan} pada posisi <strong>${d.posisi}</strong>.</p>
+                        <p>Berikut adalah ringkasan data diri singkat saya:</p>
+                        <div style="margin: 10px 0 15px 40px;">
+                            <table>
+                                <tr><td width="100">Nama</td><td>: ${d.nama}</td></tr>
+                                <tr><td>Email</td><td>: ${d.email}</td></tr>
+                                <tr><td>No. HP</td><td>: ${d.telepon}</td></tr>
+                            </table>
+                        </div>
+                        <p>Saya merupakan pribadi yang cekatan dan ${d.keahlian} Besar harapan saya untuk diberikan kesempatan mengikuti tahap wawancara.</p>
+                        <p>Demikian surat lamaran ini saya sampaikan. Atas perhatian dan kesempatan yang diberikan, saya ucapkan terima kasih.</p>
+                    </div>
+                    <div class="ttd-section">
+                        Hormat saya,
+                        <div class="ttd-space"></div>
+                        <strong><u>${d.nama}</u></strong>
+                    </div>
+                `
+            },
+            sakit: {
+                fields: [
+                    { id: 'kota', label: 'Kota & Tanggal', icon: 'fa-calendar', type: 'text', default: 'Jakarta, 13 Oktober 2026' },
+                    { id: 'tujuan', label: 'Wali Kelas / Guru', icon: 'fa-user-tie', type: 'text', default: 'Bapak/Ibu Wali Kelas XI RPL' },
+                    { id: 'sekolah', label: 'Nama Sekolah', icon: 'fa-school', type: 'text', default: 'SMKN 15 Jakarta' },
+                    { id: 'namaSiswa', label: 'Nama Siswa', icon: 'fa-user', type: 'text', default: 'Siti Nurhaliza' },
+                    { id: 'kelas', label: 'Kelas / Jurusan', icon: 'fa-graduation-cap', type: 'text', default: 'XI Rekayasa Perangkat Lunak' },
+                    { id: 'alasan', label: 'Keterangan Sakit', icon: 'fa-notes-medical', type: 'textarea', default: 'mengalami demam tinggi dan dianjurkan beristirahat total oleh dokter' },
+                    { id: 'ortu', label: 'Nama Orang Tua / Wali', icon: 'fa-users', type: 'text', default: 'Budi Santoso' }
+                ],
+                render: (d) => `
+                    <div style="text-align: right; margin-bottom: 20px;">
+                        ${d.kota}
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        Hal : Permohonan Izin Tidak Masuk Sekolah<br><br>
+                        Yth. ${d.tujuan}<br>
+                        ${d.sekolah}<br>
+                        di Tempat
+                    </div>
+                    <div class="surat-body">
+                        <p>Dengan hormat,</p>
+                        <p>Melalui surat ini, saya selaku orang tua/wali murid dari:</p>
+                        <div style="margin: 10px 0 15px 40px;">
+                            <table>
+                                <tr><td width="100">Nama</td><td>: ${d.namaSiswa}</td></tr>
+                                <tr><td>Kelas</td><td>: ${d.kelas}</td></tr>
+                            </table>
+                        </div>
+                        <p>Memberitahukan bahwa anak saya tidak dapat mengikuti kegiatan belajar mengajar pada hari ini dikarenakan <strong>${d.alasan}</strong>. Oleh karena itu, kami memohon izin kepada Bapak/Ibu guru agar berkenan memakluminya.</p>
+                        <p>Demikian surat izin ini kami sampaikan. Atas perhatian dan pengertian Bapak/Ibu, kami ucapkan terima kasih.</p>
+                    </div>
+                    <div class="ttd-section">
+                        Hormat kami,<br>Orang Tua / Wali Murid
+                        <div class="ttd-space"></div>
+                        <strong><u>${d.ortu}</u></strong>
+                    </div>
+                `
+            },
+            pernyataan: {
+                fields: [
+                    { id: 'kota', label: 'Kota & Tanggal', icon: 'fa-calendar', type: 'text', default: 'Jakarta, 13 Oktober 2026' },
+                    { id: 'nama', label: 'Nama Lengkap', icon: 'fa-user', type: 'text', default: 'Dewi Lestari' },
+                    { id: 'nik', label: 'Nomor NIK / Identitas', icon: 'fa-id-card', type: 'text', default: '3171234567890002' },
+                    { id: 'alamat', label: 'Alamat Domisili', icon: 'fa-house', type: 'text', default: 'Jl. Merpati No. 12, Jakarta Selatan' },
+                    { id: 'pernyataanIsi', label: 'Isi Pernyataan', icon: 'fa-circle-exclamation', type: 'textarea', default: 'bahwa seluruh dokumen dan data yang saya berikan adalah benar, asli, serta dapat dipertanggungjawabkan secara hukum.' }
+                ],
+                render: (d) => `
+                    <div style="text-align: center; margin-bottom: 25px;">
+                        <h3 style="text-decoration: underline; font-size: 14pt; margin-bottom: 4px;">SURAT PERNYATAAN</h3>
+                    </div>
+                    <div class="surat-body">
+                        <p>Yang bertanda tangan di bawah ini:</p>
+                        <div style="margin: 10px 0 15px 40px;">
+                            <table>
+                                <tr><td width="100">Nama</td><td>: ${d.nama}</td></tr>
+                                <tr><td>NIK</td><td>: ${d.nik}</td></tr>
+                                <tr><td>Alamat</td><td>: ${d.alamat}</td></tr>
+                            </table>
+                        </div>
+                        <p>Dengan ini menyatakan dengan sesungguhnya ${d.pernyataanIsi}</p>
+                        <p>Demikian surat pernyataan ini saya buat dengan sadar, dalam keadaan sehat jasmani rohani, serta tanpa ada unsur paksaan dari pihak manapun.</p>
+                    </div>
+                    <div style="text-align: right; margin-top: 20px;">
+                        ${d.kota}
+                    </div>
+                    <div class="ttd-section" style="margin-top: 10px;">
+                        Yang membuat pernyataan,
+                        <div class="ttd-space"></div>
+                        <strong><u>${d.nama}</u></strong>
+                    </div>
+                `
+            }
+        };
+
+        function changeTemplate() {
+            const type = document.getElementById('jenisSurat').value;
+            const config = templates[type];
+            const container = document.getElementById('dynamicForm');
+
+            container.innerHTML = config.fields.map(f => `
+                <div class="form-group">
+                    <label>${f.label}</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid ${f.icon}"></i>
+                        ${f.type === 'textarea' 
+                            ? `<textarea id="${f.id}" oninput="updatePreview()">${f.default}</textarea>`
+                            : `<input type="text" id="${f.id}" value="${f.default}" oninput="updatePreview()">`
+                        }
+                    </div>
+                </div>
+            `).join('');
+
+            updatePreview();
+        }
+
+        function updatePreview() {
+            const type = document.getElementById('jenisSurat').value;
+            const config = templates[type];
+            const data = {};
+            
+            config.fields.forEach(f => {
+                const el = document.getElementById(f.id);
+                data[f.id] = el ? el.value : '';
+            });
+
+            document.getElementById('letterPaper').innerHTML = config.render(data);
+        }
+
+        window.onload = changeTemplate;
+    </script>
+</body>
+</html>
